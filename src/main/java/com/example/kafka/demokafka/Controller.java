@@ -15,14 +15,16 @@ public class Controller {
 
     private Logger logger = LoggerFactory.getLogger(Controller.class);
     @Autowired
-    KafkaTemplate<String,String> kafkaTemplate;//kfaka template key to value
+    KafkaTemplate<String,String> kafkaTemplate;//kafka template key to value(message)
     @Value("${application.topic}")
     String topic;
 
     @PostMapping("/produce")
-    public void produceMessage(@RequestParam("msg") String msg)
+    public void produceMessage(@RequestParam("msg") String msg,@RequestParam("recipient")String recipient)
     {
-    kafkaTemplate.send(topic,msg);    //overloaded function String ->topic and message or Topic msg and key(partition)
+        //we are confirmed about ordering of messages
+        //key parameter wil send to same partition when recipient is same.Eg first it would be sent to one partition then from then onwards it would be sent o same partition for thta same recipeint
+    kafkaTemplate.send(topic,recipient,msg);    //overloaded function String ->topic and message or Topic msg and key(partition)
     logger.info("produced msg {} on topic {}", msg, topic);
 
     }
